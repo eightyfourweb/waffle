@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="6.13.1@1e3b7f0a8ab32b23197b91107adc0a7ed8a05b51">
+  <file src="src/Abstract/AbstractKernel.php">
+    <MissingConstructor>
+      <code><![CDATA[$config]]></code>
+      <code><![CDATA[$config]]></code>
+      <code><![CDATA[$config]]></code>
+      <code><![CDATA[$config]]></code>
+    </MissingConstructor>
+  </file>
   <file src="src/Abstract/AbstractResponse.php">
     <MixedMethodCall>
       <code><![CDATA[new $argType()]]></code>
@@ -8,19 +16,61 @@
       <code><![CDATA[empty($matches[0])]]></code>
       <code><![CDATA[empty($matches[1])]]></code>
     </RiskyTruthyFalsyComparison>
-    <UnusedForeachValue>
-      <code><![CDATA[$value]]></code>
-    </UnusedForeachValue>
+  </file>
+  <file src="src/Attribute/Configuration.php">
+    <MixedOperand>
+      <code><![CDATA[APP_ROOT]]></code>
+      <code><![CDATA[APP_ROOT]]></code>
+    </MixedOperand>
+  </file>
+  <file src="src/Core/Cli.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+      <code><![CDATA[Cli]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/Core/Request.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+      <code><![CDATA[Request]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="src/Core/Response.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[Response]]></code>
+      <code><![CDATA[Response]]></code>
+      <code><![CDATA[Response]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Core/Security.php">
     <ClassMustBeFinal>
       <code><![CDATA[Security]]></code>
     </ClassMustBeFinal>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[Security]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Core/System.php">
     <ClassMustBeFinal>
       <code><![CDATA[System]]></code>
     </ClassMustBeFinal>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[System]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="src/Interface/KernelInterface.php">
     <PossiblyUnusedReturnValue>
@@ -31,25 +81,20 @@
     <InvalidNamedArgument>
       <code><![CDATA[name]]></code>
     </InvalidNamedArgument>
-    <MixedAssignment>
-      <code><![CDATA[$this->routes]]></code>
-    </MixedAssignment>
     <MixedMethodCall>
       <code><![CDATA[new $route[Constant::CLASSNAME]()]]></code>
     </MixedMethodCall>
     <MixedPropertyTypeCoercion>
       <code><![CDATA[$this->scan(directory: $this->directory)]]></code>
     </MixedPropertyTypeCoercion>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$routes]]></code>
+    </PropertyNotSetInConstructor>
     <RiskyTruthyFalsyComparison>
       <code><![CDATA[$classRoute->name]]></code>
       <code><![CDATA[$route->name]]></code>
       <code><![CDATA[empty($matches[0])]]></code>
     </RiskyTruthyFalsyComparison>
-  </file>
-  <file src="src/Trait/DotenvTrait.php">
-    <UndefinedConstant>
-      <code><![CDATA[APP_ROOT]]></code>
-    </UndefinedConstant>
   </file>
   <file src="src/Trait/ReflectionTrait.php">
     <ArgumentTypeCoercion>
@@ -63,9 +108,6 @@
     </UndefinedMethod>
   </file>
   <file src="tests/src/Abstract/AbstractCliTest.php">
-    <InvalidArgument>
-      <code><![CDATA[$routeData]]></code>
-    </InvalidArgument>
     <UnusedClass>
       <code><![CDATA[AbstractCliTest]]></code>
     </UnusedClass>
@@ -78,14 +120,14 @@
       <code><![CDATA[$output]]></code>
       <code><![CDATA[$output]]></code>
     </PossiblyFalseArgument>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$kernel]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[AbstractKernelTest]]></code>
     </UnusedClass>
   </file>
   <file src="tests/src/Abstract/AbstractRequestTest.php">
-    <InvalidArgument>
-      <code><![CDATA[$routeData]]></code>
-    </InvalidArgument>
     <UnusedClass>
       <code><![CDATA[AbstractRequestTest]]></code>
     </UnusedClass>
@@ -104,9 +146,42 @@
     </UnusedClass>
   </file>
   <file src="tests/src/Abstract/AbstractSystemTest.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$securityMock]]></code>
+      <code><![CDATA[$system]]></code>
+      <code><![CDATA[class ($this->securityMock) extends AbstractSystem {
+            public function __construct(Security $security)
+            {
+                // We must call the parent constructor if it exists, but here we are
+                // setting the protected property directly as per the abstract class's design.
+                $this->security = $security;
+            }
+
+            // A minimal implementation of the abstract boot method is required to
+            // instantiate the class, even if it's not used in all tests.
+            #[\Override]
+            public function boot(KernelInterface $kernel): \Waffle\Interface\SystemInterface
+            {
+                return $this;
+            }
+        }]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[AbstractSystemTest]]></code>
     </UnusedClass>
+  </file>
+  <file src="tests/src/Abstract/Helper/ConcreteTestCli.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+      <code><![CDATA[ConcreteTestCli]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="tests/src/Abstract/Helper/ConcreteTestKernel.php">
     <MissingOverrideAttribute>
@@ -123,10 +198,28 @@
       <code><![CDATA[APP_ROOT]]></code>
     </UndefinedConstant>
   </file>
+  <file src="tests/src/Abstract/Helper/ConcreteTestRequest.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+      <code><![CDATA[ConcreteTestRequest]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
   <file src="tests/src/Abstract/Helper/ConcreteTestResponse.php">
     <ClassMustBeFinal>
       <code><![CDATA[ConcreteTestResponse]]></code>
     </ClassMustBeFinal>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[ConcreteTestResponse]]></code>
+      <code><![CDATA[ConcreteTestResponse]]></code>
+      <code><![CDATA[ConcreteTestResponse]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="tests/src/Abstract/Helper/ConcreteTestSecurity.php">
     <UnusedParam>
@@ -140,6 +233,17 @@
     <MissingOverrideAttribute>
       <code><![CDATA[public function process(): ResponseInterface]]></code>
     </MissingOverrideAttribute>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+      <code><![CDATA[ControllableTestRequest]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[ControllableTestRequest]]></code>
     </UnusedClass>
@@ -159,6 +263,30 @@
     <ClassMustBeFinal>
       <code><![CDATA[TestCli]]></code>
     </ClassMustBeFinal>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+      <code><![CDATA[TestCli]]></code>
+    </PropertyNotSetInConstructor>
+  </file>
+  <file src="tests/src/Abstract/Helper/TestRequest.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+      <code><![CDATA[TestRequest]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="tests/src/Abstract/Helper/WebKernel.php">
     <ClassMustBeFinal>
@@ -176,6 +304,10 @@
     </UnusedClass>
   </file>
   <file src="tests/src/Attribute/ConfigurationTest.php">
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$controllerDir]]></code>
+      <code><![CDATA[$serviceDir]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[ConfigurationTest]]></code>
     </UnusedClass>
@@ -214,10 +346,6 @@
     </ClassMustBeFinal>
   </file>
   <file src="tests/src/Core/RequestTest.php">
-    <InvalidArgument>
-      <code><![CDATA[$routeData]]></code>
-      <code><![CDATA[['path' => '/test', 'name' => 'test_route']]]></code>
-    </InvalidArgument>
     <UnusedClass>
       <code><![CDATA[RequestTest]]></code>
     </UnusedClass>
@@ -237,6 +365,10 @@
     <PossiblyFalseArgument>
       <code><![CDATA[json_encode($expectedData)]]></code>
     </PossiblyFalseArgument>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$originalAppEnv]]></code>
+      <code><![CDATA[$originalServer]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[ResponseTest]]></code>
     </UnusedClass>
@@ -304,6 +436,12 @@
     <MixedAssignment>
       <code><![CDATA[$cachedRoutes]]></code>
     </MixedAssignment>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$dummyControllerDir]]></code>
+      <code><![CDATA[$router]]></code>
+      <code><![CDATA[$serverBackup]]></code>
+      <code><![CDATA[$system]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[RouterTest]]></code>
     </UnusedClass>
@@ -313,6 +451,10 @@
       <code><![CDATA[$_ENV['APP_ENV']]]></code>
       <code><![CDATA[$_ENV['APP_ENV']]]></code>
     </PossiblyUndefinedArrayOffset>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$envFilePath]]></code>
+      <code><![CDATA[$envTestFilePath]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[DotenvTraitTest]]></code>
     </UnusedClass>
@@ -351,6 +493,9 @@
     <PossiblyUnusedProperty>
       <code><![CDATA[$uninitializedProperty]]></code>
     </PossiblyUnusedProperty>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$uninitializedProperty]]></code>
+    </PropertyNotSetInConstructor>
   </file>
   <file src="tests/src/Trait/MicrokernelTraitTest.php">
     <UnusedClass>
@@ -381,6 +526,9 @@
       <code><![CDATA[$output]]></code>
       <code><![CDATA[$output]]></code>
     </PossiblyFalseArgument>
+    <PropertyNotSetInConstructor>
+      <code><![CDATA[$traitObject]]></code>
+    </PropertyNotSetInConstructor>
     <UnusedClass>
       <code><![CDATA[RenderingTraitTest]]></code>
     </UnusedClass>
@@ -419,5 +567,10 @@
     <UnusedClass>
       <code><![CDATA[SystemTraitTest]]></code>
     </UnusedClass>
+  </file>
+  <file src="vendor/phpunit/phpunit/src/Framework/TestCase.php">
+    <MissingOverrideAttribute>
+      <code><![CDATA[final public function sortId(): string]]></code>
+    </MissingOverrideAttribute>
   </file>
 </files>
