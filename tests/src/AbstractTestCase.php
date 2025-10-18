@@ -11,10 +11,12 @@ use Waffle\Core\Config;
 use Waffle\Core\Container;
 use Waffle\Core\Request;
 use Waffle\Core\Security;
+use Waffle\Enum\AppMode;
+use Waffle\Enum\Failsafe;
 use Waffle\Interface\ContainerInterface;
 use Waffle\Interface\KernelInterface;
 
-abstract class TestCase extends BaseTestCase
+abstract class AbstractTestCase extends BaseTestCase
 {
     protected string $testConfigDir = APP_ROOT . DIRECTORY_SEPARATOR . APP_CONFIG;
 
@@ -86,7 +88,7 @@ abstract class TestCase extends BaseTestCase
         file_put_contents($this->testConfigDir . '/app_test.yaml', $yamlContentTest);
     }
 
-    protected function createAndGetConfig(int $securityLevel = 10, $failsafe = false): Config
+    protected function createAndGetConfig(int $securityLevel = 10, Failsafe $failsafe = Failsafe::DISABLED): Config
     {
         $this->createTestConfigFile(securityLevel: $securityLevel);
 
@@ -119,19 +121,44 @@ abstract class TestCase extends BaseTestCase
         return $kernel;
     }
 
-    protected function createRealRequest(int $level = 10, bool $isCli = false): Request
+    /**
+     * @param int $level
+     * @param AppMode $isCli
+     * @param array{
+     *       server: array<mixed>,
+     *       get: array<mixed>,
+     *       post: array<mixed>,
+     *       files: array<mixed>,
+     *       cookie: array<mixed>,
+     *       session: array<mixed>,
+     *       request: array<mixed>,
+     *       env: array<mixed>
+     *   } $globals
+     * @return Request
+     */
+    protected function createRealRequest(int $level = 10, AppMode $isCli = AppMode::WEB, array $globals = []): Request
     {
         return new Request(
             container: $this->createRealContainer(level: $level),
             cli: $isCli,
+            globals: $globals,
         );
     }
 
-    protected function createRealCli(int $level = 10): Cli
+    /**
+     * @param int $level
+     * @param array{
+     *       server: array<mixed>,
+     *       env: array<mixed>
+     *   } $globals
+     * @return Cli
+     */
+    protected function createRealCli(int $level = 10, array $globals = []): Cli
     {
         return new Cli(
             container: $this->createRealContainer(level: $level),
-            cli: true,
+            cli: AppMode::CLI,
+            globals: $globals,
         );
     }
 }

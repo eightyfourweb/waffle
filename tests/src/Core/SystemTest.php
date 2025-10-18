@@ -9,8 +9,8 @@ use Waffle\Core\Security;
 use Waffle\Core\System;
 use Waffle\Exception\SecurityException;
 use Waffle\Router\Router;
+use WaffleTests\AbstractTestCase as TestCase;
 use WaffleTests\Core\Helper\TestKernelWithConfig;
-use WaffleTests\TestCase;
 
 #[CoversClass(System::class)]
 final class SystemTest extends TestCase
@@ -75,7 +75,7 @@ final class SystemTest extends TestCase
         $system->boot($testKernel);
 
         // We retrieve the captured output and stop buffering.
-        $output = ob_get_clean() ?: '';
+        $output = ob_get_clean() ?? '';
 
         // 3. Assertions
         // First, we assert that the router was NOT registered because the security check failed.

@@ -4,18 +4,11 @@ declare(strict_types=1);
 
 namespace Waffle\Interface;
 
+use Waffle\Enum\AppMode;
+
 interface CliInterface
 {
-    public array $server {
-        get;
-        set;
-    }
-    public array $env {
-        get;
-        set;
-    }
-
-    public bool $cli {
+    public AppMode $cli {
         get;
         set;
     }
@@ -39,7 +32,17 @@ interface CliInterface
         set;
     }
 
-    public function configure(ContainerInterface $container, bool $cli): void;
+    /**
+     * @template T
+     * @param ContainerInterface $container
+     * @param AppMode $cli
+     * @param array{
+     *       server: T|string|array<mixed>,
+     *       env: T|string|array<mixed>
+     *   } $globals
+     * @return void
+     */
+    public function configure(ContainerInterface $container, AppMode $cli, array $globals = []): void;
 
     public function process(): ResponseInterface;
 
@@ -54,4 +57,22 @@ interface CliInterface
      * @return $this
      */
     public function setCurrentRoute(null|array $route = null): self;
+
+    public function isCli(): bool;
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function server(string $key, mixed $default = null): mixed;
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function env(string $key, mixed $default = null): mixed;
 }

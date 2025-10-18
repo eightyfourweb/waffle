@@ -11,8 +11,9 @@ use ReflectionException;
 use Waffle\Abstract\AbstractRequest;
 use Waffle\Core\Request;
 use Waffle\Core\Response;
+use Waffle\Enum\AppMode;
+use WaffleTests\AbstractTestCase as TestCase;
 use WaffleTests\Router\Dummy\DummyController;
-use WaffleTests\TestCase;
 
 #[CoversClass(Request::class)]
 final class RequestTest extends TestCase
@@ -116,14 +117,25 @@ final class RequestTest extends TestCase
         $GLOBALS['_' . strtoupper($property)] = $superglobal;
 
         // When: A new Request object is created.
-        $request = $this->createRealRequest();
+        $request = $this->createRealRequest(globals: [
+            'server' => $superglobal,
+            'get' => $superglobal,
+            'post' => $superglobal,
+            'files' => $superglobal,
+            'cookie' => $superglobal,
+            'session' => $superglobal,
+            'request' => $superglobal,
+            'env' => $superglobal,
+        ]);
         $request->configure(
             container: $request->container,
-            cli: false,
+            cli: AppMode::WEB,
         ); // Manually trigger configuration to load superglobals
 
         // Then: The public property should accurately reflect the superglobal values.
-        static::assertSame($superglobal, $request->{$property});
+        foreach ($superglobal as $key => $value) {
+            static::assertSame($value, $request->{$property}(key: $key));
+        }
     }
 
     /**

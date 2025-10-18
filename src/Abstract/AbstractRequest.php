@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waffle\Abstract;
 
 use Waffle\Core\Response;
+use Waffle\Enum\AppMode;
 use Waffle\Exception\RouteNotFoundException;
 use Waffle\Interface\ContainerInterface;
 use Waffle\Interface\RequestInterface;
@@ -16,69 +17,54 @@ abstract class AbstractRequest implements RequestInterface
     use RequestTrait;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $globals {
-        get => $GLOBALS;
-    }
+    private array $server;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $server {
-        get => $_SERVER;
-    }
+    private array $get;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $get {
-        get => $_GET;
-    }
+    private array $post;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $post {
-        get => $_POST;
-    }
+    private array $files;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $files {
-        get => $_FILES;
-    }
+    private array $cookie;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $cookie {
-        get => $_COOKIE;
-    }
+    private array $session;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $session {
-        get => $_SESSION;
-    }
+    private array $request;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $request {
-        get => $_REQUEST;
-    }
+    private array $env;
 
-    /**
-     * @var array<mixed>
-     */
-    public array $env {
-        get => $_ENV;
-    }
-
-    public bool $cli = false {
+    public AppMode $cli = AppMode::WEB {
         set => $this->cli = $value;
     }
 
@@ -100,13 +86,47 @@ abstract class AbstractRequest implements RequestInterface
         set => $this->container = $value;
     }
 
-    abstract public function __construct(ContainerInterface $container, bool $cli);
+    /**
+     * @template T
+     * @param ContainerInterface $container
+     * @param AppMode $cli
+     * @param array{
+     *       server: T|string|array<mixed>,
+     *       get: T|string|array<mixed>,
+     *       post: T|string|array<mixed>,
+     *       files: T|string|array<mixed>,
+     *       cookie: T|string|array<mixed>,
+     *       session: T|string|array<mixed>,
+     *       request: T|string|array<mixed>,
+     *       env: T|string|array<mixed>
+     *   } $globals
+     */
+    abstract public function __construct(ContainerInterface $container, AppMode $cli, array $globals = []);
 
+    /**
+     * @template T
+     * @param ContainerInterface $container
+     * @param AppMode $cli
+     * @param array{
+     *       server: T|string|array<mixed>,
+     *       get: T|string|array<mixed>,
+     *       post: T|string|array<mixed>,
+     *       files: T|string|array<mixed>,
+     *       cookie: T|string|array<mixed>,
+     *       session: T|string|array<mixed>,
+     *       request: T|string|array<mixed>,
+     *       env: T|string|array<mixed>
+     *   } $globals
+     * @return void
+     */
     #[\Override]
-    public function configure(ContainerInterface $container, bool $cli): void
+    public function configure(ContainerInterface $container, AppMode $cli, array $globals = []): void
     {
         $this->container = $container;
         $this->cli = $cli;
+        foreach ($globals as $key => $value) {
+            $this->{$key} = $value;
+        }
     }
 
     /**
@@ -115,7 +135,7 @@ abstract class AbstractRequest implements RequestInterface
     #[\Override]
     public function process(): ResponseInterface
     {
-        if (null === $this->currentRoute && !$this->isCli()) {
+        if (null === $this->currentRoute && AppMode::WEB === $this->cli) {
             // Instead of exiting, we now throw a specific exception.
             throw new RouteNotFoundException();
         }
@@ -143,6 +163,94 @@ abstract class AbstractRequest implements RequestInterface
 
     public function isCli(): bool
     {
-        return $this->cli;
+        return $this->cli === AppMode::CLI;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function server(string $key, mixed $default = null): mixed
+    {
+        return $this->server[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function get(string $key, mixed $default = null): mixed
+    {
+        return $this->get[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function post(string $key, mixed $default = null): mixed
+    {
+        return $this->post[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function files(string $key, mixed $default = null): mixed
+    {
+        return $this->files[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function cookie(string $key, mixed $default = null): mixed
+    {
+        return $this->cookie[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function session(string $key, mixed $default = null): mixed
+    {
+        return $this->session[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function request(string $key, mixed $default = null): mixed
+    {
+        return $this->request[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function env(string $key, mixed $default = null): mixed
+    {
+        return $this->env[$key] ?? $default;
     }
 }

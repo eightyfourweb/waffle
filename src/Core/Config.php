@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Waffle\Core;
 
+use Waffle\Enum\Failsafe;
+
 class Config
 {
     private array $parameters = [];
 
-    public function __construct(string $configDir, string $environment, bool $failsafe = false)
+    public function __construct(string $configDir, string $environment, Failsafe $failsafe = Failsafe::DISABLED)
     {
-        if ($failsafe) {
+        if ($failsafe === Failsafe::ENABLED) {
             $this->loadFailsafeDefaults();
             return;
         }
@@ -68,9 +70,10 @@ class Config
         foreach ($config as &$value) {
             if (is_array($value)) {
                 $this->resolveEnvPlaceholders($value);
-            } elseif (is_string($value) && preg_match('/^%env\((.*)\)%$/', $value, $matches)) {
+            }
+            if (is_string($value) && preg_match('/^%env\((.*)\)%$/', $value, $matches)) {
                 $envVar = getenv($matches[1]);
-                $value = $envVar !== false ? $envVar : null;
+                $value = $envVar ?? null;
             }
         }
     }

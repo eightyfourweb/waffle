@@ -14,6 +14,8 @@ use Waffle\Core\Response;
 use Waffle\Core\Security;
 use Waffle\Core\System;
 use Waffle\Core\View;
+use Waffle\Enum\AppMode;
+use Waffle\Enum\Failsafe;
 use Waffle\Exception\RouteNotFoundException;
 use Waffle\Exception\SecurityException;
 use Waffle\Factory\ContainerFactory;
@@ -128,7 +130,25 @@ abstract class AbstractKernel implements KernelInterface
     #[\Override]
     public function createRequestFromGlobals(): RequestInterface
     {
-        $req = new Request(container: $this->container);
+        $reqMethod = match ($_SERVER['REQUEST_METHOD']) {
+            Constant::METHOD_POST => $_POST ?? [],
+            default => $_GET ?? [],
+        };
+        $globals = [
+            'server' => $_SERVER ?? [],
+            'get' => $_GET ?? [],
+            'post' => $_POST ?? [],
+            'files' => $_FILES ?? [],
+            'cookie' => $_COOKIE ?? [],
+            'session' => $_SESSION ?? [],
+            'request' => $reqMethod,
+            'env' => $_ENV ?? [],
+        ];
+        $req = new Request(
+            container: $this->container,
+            cli: AppMode::WEB,
+            globals: $globals,
+        );
         if ($this->system instanceof System) {
             $router = $this->system->getRouter();
             if (null !== $router && !$req->isCli()) {
@@ -162,10 +182,15 @@ abstract class AbstractKernel implements KernelInterface
     public function createCliFromRequest(): CliInterface
     {
         // TODO(@supa-chayajin): Handle CLI command from request
+        $globals = [
+            'server' => $_SERVER ?? [],
+            'env' => $_ENV ?? [],
+        ];
 
         return new Cli(
             container: $this->container,
-            cli: false,
+            cli: AppMode::WEB,
+            globals: $globals,
         );
     }
 
@@ -190,7 +215,7 @@ abstract class AbstractKernel implements KernelInterface
             $config = new Config(
                 configDir: APP_ROOT . '/app',
                 environment: 'prod',
-                failsafe: true,
+                failsafe: Failsafe::ENABLED,
             );
             $security = new Security(cfg: $config);
             $failsafeContainer = new Container(security: $security);
@@ -198,7 +223,7 @@ abstract class AbstractKernel implements KernelInterface
 
         $handler = new Request(
             container: $failsafeContainer,
-            cli: false,
+            cli: AppMode::WEB,
         );
         $statusCode = 500;
 

@@ -6,7 +6,7 @@ namespace WaffleTests\Abstract;
 
 use Waffle\Interface\KernelInterface;
 use WaffleTests\Abstract\Helper\WebKernel;
-use WaffleTests\TestCase;
+use WaffleTests\AbstractTestCase as TestCase;
 
 final class AbstractKernelTest extends TestCase
 {
@@ -38,13 +38,27 @@ final class AbstractKernelTest extends TestCase
     public function testHandleWithMatchingRouteRendersResponse(): void
     {
         // Simulate a web request to a valid URI.
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/users';
         $_ENV['APP_ENV'] = 'dev';
+        $this->createRealRequest(
+            level: 2,
+            globals: [
+                'server' => $_SERVER ?? [],
+                'get' => $_GET ?? [],
+                'post' => $_POST ?? [],
+                'files' => $_FILES ?? [],
+                'cookie' => $_COOKIE ?? [],
+                'session' => $_SESSION ?? [],
+                'request' => $_GET ?? [],
+                'env' => $_ENV ?? [],
+            ],
+        );
 
         // Start the output buffer to capture the echoed JSON.
         ob_start();
         $this->kernel?->handle();
-        $output = ob_get_clean() ?: '';
+        $output = ob_get_clean() ?? '';
 
         // Assert that the output is the expected JSON response.
         static::assertJson($output);
@@ -55,12 +69,13 @@ final class AbstractKernelTest extends TestCase
     public function testHandleCatchesAndRendersThrowable(): void
     {
         // Simulate a request to our new, unambiguous error route.
+        $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/trigger-error';
         $_ENV['APP_ENV'] = 'dev';
 
         ob_start();
         $this->kernel?->handle();
-        $output = ob_get_clean() ?: '';
+        $output = ob_get_clean() ?? '';
 
         // Assert that the output contains the expected error message.
         static::assertJson($output);
@@ -87,7 +102,7 @@ final class AbstractKernelTest extends TestCase
         // Now, when we call handle(), it will be forced to take the CLI execution path.
         ob_start();
         $kernel->handle();
-        $output = ob_get_clean() ?: '';
+        $output = ob_get_clean() ?? '';
 
         // In the current implementation, the CLI path does nothing and produces no output.
         static::assertEmpty($output);

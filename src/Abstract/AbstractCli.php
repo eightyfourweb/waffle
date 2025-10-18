@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waffle\Abstract;
 
 use Waffle\Core\Response;
+use Waffle\Enum\AppMode;
 use Waffle\Interface\CliInterface;
 use Waffle\Interface\ContainerInterface;
 use Waffle\Interface\ResponseInterface;
@@ -12,69 +13,18 @@ use Waffle\Interface\ResponseInterface;
 abstract class AbstractCli implements CliInterface
 {
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $globals {
-        get => $GLOBALS;
-    }
+    private array $server;
 
     /**
-     * @var array<mixed>
+     * @template T
+     * @var T|string|array<mixed>
      */
-    public array $server {
-        get => $_SERVER;
-    }
+    private array $env;
 
-    /**
-     * @var array<mixed>
-     */
-    public array $get {
-        get => $_GET;
-    }
-
-    /**
-     * @var array<mixed>
-     */
-    public array $post {
-        get => $_POST;
-    }
-
-    /**
-     * @var array<mixed>
-     */
-    public array $files {
-        get => $_FILES;
-    }
-
-    /**
-     * @var array<mixed>
-     */
-    public array $cookie {
-        get => $_COOKIE;
-    }
-
-    /**
-     * @var array<mixed>
-     */
-    public array $session {
-        get => $_SESSION;
-    }
-
-    /**
-     * @var array<mixed>
-     */
-    public array $request {
-        get => $_REQUEST;
-    }
-
-    /**
-     * @var array<mixed>
-     */
-    public array $env {
-        get => $_ENV;
-    }
-
-    public bool $cli = true {
+    public AppMode $cli = AppMode::CLI {
         set => $this->cli = $value;
     }
 
@@ -96,13 +46,35 @@ abstract class AbstractCli implements CliInterface
         set => $this->container = $value;
     }
 
-    abstract public function __construct(ContainerInterface $container, bool $cli);
+    /**
+     * @template T
+     * @param ContainerInterface $container
+     * @param AppMode $cli
+     * @param array{
+     *       server: T|string|array<mixed>,
+     *       env: T|string|array<mixed>
+     *   } $globals
+     */
+    abstract public function __construct(ContainerInterface $container, AppMode $cli, array $globals = []);
 
+    /**
+     * @template T
+     * @param ContainerInterface $container
+     * @param AppMode $cli
+     * @param array{
+     *       server: T|string|array<mixed>,
+     *       env: T|string|array<mixed>
+     *   } $globals
+     * @return void
+     */
     #[\Override]
-    public function configure(ContainerInterface $container, bool $cli): void
+    public function configure(ContainerInterface $container, AppMode $cli, array $globals = []): void
     {
         $this->container = $container;
         $this->cli = $cli;
+        foreach ($globals as $key => $value) {
+            $this->{$key} = $value;
+        }
     }
 
     #[\Override]
@@ -127,5 +99,32 @@ abstract class AbstractCli implements CliInterface
         $this->currentRoute = $route;
 
         return $this;
+    }
+
+    public function isCli(): bool
+    {
+        return $this->cli === AppMode::CLI;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function server(string $key, mixed $default = null): mixed
+    {
+        return $this->server[$key] ?? $default;
+    }
+
+    /**
+     * @template T
+     * @param string $key
+     * @param T $default
+     * @return T|string|array<mixed>
+     */
+    public function env(string $key, mixed $default = null): mixed
+    {
+        return $this->env[$key] ?? $default;
     }
 }
